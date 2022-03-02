@@ -1,5 +1,5 @@
 /// Copyright (c) 2022 Razeware LLC
-///
+/// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -34,6 +34,7 @@ import SwiftUI
 
 struct ColorPickerView: View {
   @State var pickedColor: ColorPicker.Color = .red
+
   var body: some View {
     VStack {
       Circle()
@@ -45,23 +46,20 @@ struct ColorPickerView: View {
 }
 
 struct ColorPicker: View {
-  @Binding var pickedColor: ColorPicker.Color
-  let diameter: CGFloat = 40
+  let diameter: Double = 40
+  @Binding var pickedColor: Color
 
   var body: some View {
     HStack {
-      ForEach(Color.allCases, id: \.self) { pickedColor in
+      ForEach(Color.allCases, id: \.self) { color in
         ZStack {
           Circle()
-            .foregroundColor(pickedColor.color)
+            .foregroundColor(color.color)
             .frame(width: diameter, height: diameter)
-            .onTapGesture { self.pickedColor = pickedColor }
+            .onTapGesture { pickedColor = color }
           Circle()
-            .foregroundColor(.white)
-            .frame(
-              width: self.pickedColor == pickedColor
-              ? self.diameter * 0.25
-              : 0)
+            .foregroundColor(SwiftUI.Color(uiColor: UIColor.systemBackground))
+            .frame(width: pickedColor == color ? diameter * 0.25 : 0)
         }
       }
     }
@@ -76,7 +74,6 @@ extension ColorPicker {
     var color: SwiftUI.Color {
       SwiftUI.Color(uiColor)
     }
-
     var uiColor: UIColor {
       switch self {
       case .black:
@@ -98,8 +95,9 @@ extension ColorPicker {
   }
 }
 
-struct ColorPickerView_Previews: PreviewProvider {
+struct ColorPicker_Previews: PreviewProvider {
   static var previews: some View {
     ColorPickerView()
+      .preferredColorScheme(.dark)
   }
 }

@@ -1,6 +1,5 @@
-//
-/// Copyright (c) 2019 Razeware LLC
-///
+/// Copyright (c) 2022 Razeware LLC
+/// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -18,6 +17,10 @@
 /// or information technology.  Permission for such use, copying, modification,
 /// merger, publication, distribution, sublicensing, creation of derivative works,
 /// or sale is expressly withheld.
+///
+/// This project and source code may use libraries or frameworks that are
+/// released under various Open-Source licenses. Use of those libraries and
+/// frameworks are governed by their own individual licenses.
 ///
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -51,37 +54,11 @@ struct FlyoutMenu: View {
 
       ForEach(options.indexed(), id: \.index) { index, option in
         button(option: option, atIndex: index)
+          .scaleEffect(isOpen ? 1 : 0.1)
       }
-      .scaleEffect(isOpen ? 1 : 0.1)
       .disabled(!isOpen)
 
       MainView(iconDiameter: iconDiameter, isOpen: $isOpen)
-    }
-  }
-}
-
-private extension FlyoutMenu {
-  struct MainView: View {
-    let iconDiameter: Double
-    @Binding var isOpen: Bool
-
-    var body: some View {
-      Button {
-        withAnimation(.spring()) {
-          isOpen.toggle()
-        }
-//        endTextEditing()
-      } label: {
-        ZStack {
-          Circle()
-            .foregroundColor(.red)
-            .frame(width: iconDiameter, height: iconDiameter)
-          Image(systemName: "plus")
-            .foregroundColor(.white)
-            .font(.title)
-            .rotationEffect(isOpen ? .degrees(45) : .degrees(0))
-        }
-      }
     }
   }
 
@@ -99,20 +76,42 @@ private extension FlyoutMenu {
           .foregroundColor(.white)
       }
     }
-    .offset(
-      x: cos(angle) * radius,
-      y: sin(angle) * radius
-    )
+    .offset(x: cos(angle) * radius, y: sin(angle) * radius)
+  }
+}
+
+private extension FlyoutMenu {
+  struct MainView: View {
+    let iconDiameter: Double
+    @Binding var isOpen: Bool
+
+    var body: some View {
+      Button {
+        withAnimation(.spring()) {
+          isOpen.toggle()
+        }
+      } label: {
+        ZStack {
+          Circle()
+            .foregroundColor(.red)
+            .frame(width: iconDiameter, height: iconDiameter)
+          Image(systemName: "plus")
+            .foregroundColor(.white)
+            .font(.title)
+            .rotationEffect(isOpen ? .degrees(45) : .degrees(0))
+        }
+      }
+    }
   }
 }
 
 struct FlyoutMenu_Previews: PreviewProvider {
   static var options: [FlyoutMenu.Option] = [
     .init(image: .init(systemName: "trash"), color: .blue),
-    .init(image: .init(systemName: "link"), color: .purple),
     .init(image: .init(systemName: "pawprint"), color: .orange),
     .init(image: .init(systemName: "book"), color: .teal),
-    .init(image: .init(systemName: "flame"), color: .red)
+    .init(image: .init(systemName: "flame"), color: .red),
+    .init(image: .init(systemName: "link"), color: .purple)
   ]
 
   static var previews: some View {

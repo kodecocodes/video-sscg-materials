@@ -1,5 +1,4 @@
-//
-/// Copyright (c) 2019 Razeware LLC
+/// Copyright (c) 2022 Razeware LLC
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +18,10 @@
 /// merger, publication, distribution, sublicensing, creation of derivative works,
 /// or sale is expressly withheld.
 ///
+/// This project and source code may use libraries or frameworks that are
+/// released under various Open-Source licenses. Use of those libraries and
+/// frameworks are governed by their own individual licenses.
+///
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 /// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,28 +33,24 @@
 import SwiftUI
 
 struct ContentView: View {
-  @EnvironmentObject var cellData: CellStore
-  @EnvironmentObject var modalViews: ModalViews
+  @EnvironmentObject var cellStore: CellStore
+  @EnvironmentObject var modalViews: ContentView.ModalViews
 
   @State private var cellShape = CellShape.roundedRect
-  
+
   var body: some View {
-    ZStack {
-      GeometryReader { geometryProxy in
-        BackgroundView(size: geometryProxy.size)
-      }
-      .ignoresSafeArea()
-      .sheet(isPresented: $modalViews.showShapes) {
-        ShapeSelectionGrid(selectedCellShape: $cellShape)
-      }
-      .fullScreenCover(isPresented: $modalViews.showDrawingPad) {
-        DrawingPadSwiftUI()
-        //TODO: Pass Cell Drawing back to drawing pad
-      }
+    GeometryReader { geometryProxy in
+      BackgroundView(size: geometryProxy.size)
     }
     .onChange(of: cellShape) { newShape in
-      guard let cell = cellData.selectedCell else { return }
-      cellData.updateShape(cell: cell, shape: newShape)
+      guard let cell = cellStore.selectedCell else { return }
+      cellStore.updateShape(cell: cell, shape: newShape)
+    }
+    .sheet(isPresented: $modalViews.showShapes) {
+      ShapeSelectionGrid(selectedCellShape: $cellShape)
+    }
+    .fullScreenCover(isPresented: $modalViews.showDrawingPad) {
+      DrawingPadView(drawing: cellStore.selectedCell?.drawing)
     }
   }
 }
@@ -65,8 +64,9 @@ extension ContentView {
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    ContentView().colorScheme(.light)
+    ContentView()
       .environmentObject(CellStore())
       .environmentObject(ContentView.ModalViews())
   }
 }
+

@@ -1,5 +1,5 @@
 /// Copyright (c) 2022 Razeware LLC
-///
+/// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -34,7 +34,6 @@ import SwiftUI
 
 struct BackgroundView: View {
   @EnvironmentObject var cellStore: CellStore
-
   let size: CGSize
 
   var body: some View {
@@ -43,18 +42,17 @@ struct BackgroundView: View {
       .sequenced(before: doubleTapDrag)
       .onEnded { value in
         switch value {
-        case .second((), let drag):
+        case .second(_, let drag):
           if let drag = drag {
             print("add new cell at: ", drag.location)
             newCell(location: drag.location)
           }
         default: break
         }
-    }
-
+      }
+    
     ZStack {
-      GridView().colorMultiply(.indigo)
-      Color.teal.opacity(0.7)
+      GridView()
         .ignoresSafeArea()
         .onTapGesture { cellStore.selectedCell = nil }
         .simultaneousGesture(doubleTap)
@@ -66,9 +64,10 @@ struct BackgroundView: View {
   }
 
   func newCell(location: CGPoint) {
-    let offsetX = location.x - size.width / 2
-    let offsetY = location.y - size.height / 2
-    let offset = CGSize(width: offsetX, height: offsetY)
+    let offset = CGSize(
+      width: location.x - size.width / 2,
+      height: location.y - size.height / 2
+    )
     let cell = cellStore.addCell(offset: offset)
     cellStore.selectedCell = cell
   }

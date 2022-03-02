@@ -1,6 +1,5 @@
-//
-/// Copyright (c) 2019 Razeware LLC
-///
+/// Copyright (c) 2022 Razeware LLC
+/// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -19,6 +18,10 @@
 /// merger, publication, distribution, sublicensing, creation of derivative works,
 /// or sale is expressly withheld.
 ///
+/// This project and source code may use libraries or frameworks that are
+/// released under various Open-Source licenses. Use of those libraries and
+/// frameworks are governed by their own individual licenses.
+///
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 /// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,11 +35,11 @@ import SwiftUI
 struct ColorSlider: View {
   @Binding var sliderValue: Double
   var range: ClosedRange<Double> = 0...1
-  var color: Color = .blue
+  var colors: [Color] = [.black, .blue, .white]
 
   var body: some View {
     let gradient = LinearGradient(
-      gradient: Gradient(colors: [.black, color, .white]),
+      colors: colors,
       startPoint: .leading,
       endPoint: .trailing)
 
@@ -45,56 +48,60 @@ struct ColorSlider: View {
         gradient
           .cornerRadius(5)
           .frame(height: 10)
-
         SliderCircleView(
-          value: $sliderValue, range: range,
+          value: $sliderValue,
+          range: range,
           sliderWidth: geometry.size.width)
       }
-      .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
+      .frame(
+        width: geometry.size.width,
+        height: geometry.size.height,
+        alignment: .center)
     }
   }
 }
 
-struct ColorSliderView_Previews: PreviewProvider {
+extension ColorSlider {
+  struct SliderCircleView: View {
+    @Binding var value: Double
+    let range: ClosedRange<Double>
+    let sliderWidth: Double
+    let diameter: Double = 30
+    @State private var offset: CGSize = .zero
+
+    var sliderValue: Double {
+      let percent = Double(offset.width / (sliderWidth - diameter))
+      let value = (range.upperBound - range.lowerBound) * percent + range.lowerBound
+      return value
+    }
+
+    var body: some View {
+      let drag = DragGesture()
+        .onChanged {
+          offset.width = clampWidth(translation: $0.translation.width)
+          value = sliderValue
+        }
+
+      Circle()
+        .foregroundColor(.white)
+        .shadow(color: .gray, radius: 1)
+        .frame(width: diameter, height: diameter)
+        .gesture(drag)
+        .offset(offset)
+    }
+
+    func clampWidth(translation: Double) -> Double {
+      min(sliderWidth - diameter, max(0, offset.width + translation))
+    }
+  }
+}
+
+struct ColorSlider_Previews: PreviewProvider {
   @State static var sliderValue: Double = 0
-  
+
   static var previews: some View {
     ColorSlider(sliderValue: $sliderValue)
       .padding()
       .background(.secondary)
-  }
-}
-
-struct SliderCircleView: View {
-  @Binding var value: Double
-  let range: ClosedRange<Double>
-  let sliderWidth: Double
-
-  let diameter: CGFloat = 30
-  @State private var offset = CGSize.zero
-
-  var sliderValue: Double {
-    let percent = Double(offset.width / (sliderWidth - diameter))
-    let value = (range.upperBound - range.lowerBound) * percent + range.lowerBound
-    return value
-  }
-
-  var body: some View {
-    let drag = DragGesture()
-      .onChanged {
-        offset.width = clampWidth(translation: $0.translation.width)
-        value = sliderValue
-      }
-
-    Circle()
-      .foregroundColor(.white)
-      .shadow(color: .gray, radius: 1)
-      .frame(width: diameter, height: diameter)
-      .gesture(drag)
-      .offset(offset)
-  }
-
-  func clampWidth(translation: CGFloat) -> CGFloat {
-    min(sliderWidth - diameter, max(0, offset.width + translation))
   }
 }

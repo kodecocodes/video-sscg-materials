@@ -1,6 +1,5 @@
-//
-/// Copyright (c) 2019 Razeware LLC
-///
+/// Copyright (c) 2022 Razeware LLC
+/// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -19,6 +18,10 @@
 /// merger, publication, distribution, sublicensing, creation of derivative works,
 /// or sale is expressly withheld.
 ///
+/// This project and source code may use libraries or frameworks that are
+/// released under various Open-Source licenses. Use of those libraries and
+/// frameworks are governed by their own individual licenses.
+///
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 /// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,20 +30,16 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-import Foundation
-import SwiftUI
+import CoreGraphics
 
 func +(left: CGSize, right: CGSize) -> CGSize {
-  return CGSize(width: left.width + right.width,
-                height: left.height + right.height)
+  CGSize(width: left.width + right.width, height: left.height + right.height)
 }
 
 extension CGSize {
-  func scale(toFit rect: CGSize) -> CGAffineTransform {
+  func scaleFactor(toFit rect: CGSize) -> Double {
     let scaleX = rect.width / self.width
     let scaleY = rect.height / self.height
-    let scaleFactor = min(scaleX, scaleY)
-    return CGAffineTransform(scaleX: scaleFactor, y: scaleFactor)
+    return min(scaleX, scaleY)
   }
 }
-

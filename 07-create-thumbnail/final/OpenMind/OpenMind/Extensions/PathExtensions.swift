@@ -1,4 +1,4 @@
-/// Copyright (c) 2019 Razeware LLC
+/// Copyright (c) 2022 Razeware LLC
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -17,6 +17,10 @@
 /// or information technology.  Permission for such use, copying, modification,
 /// merger, publication, distribution, sublicensing, creation of derivative works,
 /// or sale is expressly withheld.
+///
+/// This project and source code may use libraries or frameworks that are
+/// released under various Open-Source licenses. Use of those libraries and
+/// frameworks are governed by their own individual licenses.
 ///
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -39,8 +43,8 @@ import SwiftUI
 
 extension Path {
   mutating func interpolatePointsWithHermite(interpolationPoints : [CGPoint], alpha : CGFloat = 1.0/3.0) {
-
     guard !interpolationPoints.isEmpty else { return }
+    self = Path()
     self.move(to: interpolationPoints[0])
 
     let n = interpolationPoints.count - 1
@@ -87,7 +91,7 @@ extension Path {
 }
 
 extension Path {
-  func interpolatePointsWithHermite(path: Path, interpolationPoints : [CGPoint], alpha : CGFloat = 1.0/3.0) -> Path {
+  static func interpolatePointsWithHermite(path: Path, interpolationPoints : [CGPoint], alpha : CGFloat = 1.0/3.0) -> Path {
     var path = path
 
     guard !interpolationPoints.isEmpty else { return path }

@@ -1,6 +1,5 @@
-//
-/// Copyright (c) 2019 Razeware LLC
-///
+/// Copyright (c) 2022 Razeware LLC
+/// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -19,6 +18,10 @@
 /// merger, publication, distribution, sublicensing, creation of derivative works,
 /// or sale is expressly withheld.
 ///
+/// This project and source code may use libraries or frameworks that are
+/// released under various Open-Source licenses. Use of those libraries and
+/// frameworks are governed by their own individual licenses.
+///
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 /// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,20 +33,24 @@
 import SwiftUI
 
 struct GridView: View {
-    var body: some View {
-      let size = CGSize(width: 30, height: 30)
-      let image = Image(uiImage: gridImage(size: size))
-      
-      return Rectangle()
+  var body: some View {
+    let size = CGSize(width: 30, height: 30)
+    let image = Image(uiImage: gridImage(size: size))
+
+    ZStack {
+      Color(uiColor: .tertiarySystemBackground)
+      Rectangle()
         .fill(ImagePaint(image: image))
-          .edgesIgnoringSafeArea(.all)
     }
-  
+    .ignoresSafeArea()
+  }
+
   func gridImage(size: CGSize) -> UIImage {
     let width = size.width
     let height = size.height
     return UIGraphicsImageRenderer(size: size).image { context in
-      UIColor.lightGray.setStroke()
+      UIColor.systemTeal.setStroke()
+
       let path = UIBezierPath()
       path.move(to: CGPoint(x: width, y: 0))
       path.addLine(to: CGPoint(x: width, y: height))
@@ -54,7 +61,7 @@ struct GridView: View {
 }
 
 struct GridView_Previews: PreviewProvider {
-    static var previews: some View {
-        GridView()
-    }
+  static var previews: some View {
+    GridView()
+  }
 }

@@ -1,6 +1,5 @@
-//
-/// Copyright (c) 2019 Razeware LLC
-///
+/// Copyright (c) 2022 Razeware LLC
+/// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -19,6 +18,10 @@
 /// merger, publication, distribution, sublicensing, creation of derivative works,
 /// or sale is expressly withheld.
 ///
+/// This project and source code may use libraries or frameworks that are
+/// released under various Open-Source licenses. Use of those libraries and
+/// frameworks are governed by their own individual licenses.
+///
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 /// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,24 +34,23 @@ import SwiftUI
 
 struct BackgroundView: View {
   @EnvironmentObject var cellStore: CellStore
-
   let size: CGSize
-  
+
   var body: some View {
     let doubleTapDrag = DragGesture(minimumDistance: 0)
     let doubleTap = TapGesture(count: 2)
       .sequenced(before: doubleTapDrag)
       .onEnded { value in
         switch value {
-        case .second((), let drag):
+        case .second(_, let drag):
           if let drag = drag {
             print("add new cell at: ", drag.location)
             newCell(location: drag.location)
           }
         default: break
         }
-    }
-
+      }
+    
     ZStack {
       Color.teal.opacity(0.7)
         .ignoresSafeArea()
@@ -60,11 +62,12 @@ struct BackgroundView: View {
       }
     }
   }
-  
+
   func newCell(location: CGPoint) {
-    let offsetX = location.x - size.width / 2
-    let offsetY = location.y - size.height / 2
-    let offset = CGSize(width: offsetX, height: offsetY)
+    let offset = CGSize(
+      width: location.x - size.width / 2,
+      height: location.y - size.height / 2
+    )
     let cell = cellStore.addCell(offset: offset)
     cellStore.selectedCell = cell
   }

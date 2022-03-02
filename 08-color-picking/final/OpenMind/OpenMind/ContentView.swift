@@ -33,48 +33,41 @@
 import SwiftUI
 
 struct ContentView: View {
-  @EnvironmentObject var cellData: CellStore
-  @EnvironmentObject var modalViews: ModalViews
+  @EnvironmentObject var cellStore: CellStore
+  @EnvironmentObject var modalViews: ContentView.ModalViews
 
   @State private var cellShape = CellShape.roundedRect
-  
+
   var body: some View {
-    ZStack {
-      GeometryReader { geometry in
-        BackgroundView(size: geometry.size)
-      }
-      .edgesIgnoringSafeArea(.all)
-      .sheet(isPresented: self.$modalViews.showShapes) {
-        ShapeSelectionGrid(selectedCellShape: $cellShape)
-      }
-      .fullScreenCover(isPresented: self.$modalViews.showDrawingPad) {
-        if UIDevice.current.userInterfaceIdiom == .pad {
-          DrawingPad(
-            pickedColor: .red,
-            drawingImage: cellData.selectedCell?.drawingImage)
-        } else {
-          DrawingPadSwiftUI()
-        }
-      }
+    GeometryReader { geometryProxy in
+      BackgroundView(size: geometryProxy.size)
     }
+    .ignoresSafeArea()
     .onChange(of: cellShape) { newShape in
-      guard let cell = self.cellData.selectedCell else { return }
-      cellData.updateShape(cell: cell, shape: newShape)
+      guard let cell = cellStore.selectedCell else { return }
+      cellStore.updateShape(cell: cell, shape: newShape)
+    }
+    .sheet(isPresented: $modalViews.showShapes) {
+      ShapeSelectionGrid(selectedCellShape: $cellShape)
+    }
+    .fullScreenCover(isPresented: $modalViews.showDrawingPad) {
+      DrawingPadView(drawing: cellStore.selectedCell?.drawing)
     }
   }
 }
 
 extension ContentView {
   class ModalViews: ObservableObject {
-    @Published var showShapes: Bool = false
-    @Published var showDrawingPad: Bool = false
+    @Published var showShapes = false
+    @Published var showDrawingPad = false
   }
 }
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    ContentView().colorScheme(.light)
+    ContentView()
       .environmentObject(CellStore())
       .environmentObject(ContentView.ModalViews())
   }
 }
+

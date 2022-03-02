@@ -1,5 +1,5 @@
 /// Copyright (c) 2022 Razeware LLC
-///
+/// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -30,50 +30,43 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-import Foundation
-import SwiftUI
 import Combine
+import SwiftUI
 
 let minCellSize = CGSize(width: 200, height: 100)
 
 struct Drawing: Equatable {
   var paths: [DrawingPath] = []
-  var canvasSize = CGSize.zero
+  var size = CGSize.zero
 }
 
 struct Cell: Identifiable, Equatable {
   var id = UUID()
-  var color = ColorPicker.Color.allCases.randomElement()!.color
+  var color = Color("Violet")
   var size = minCellSize
   var offset = CGSize.zero
   var shape = CellShape.allCases.randomElement()!
   var text = "New Idea!"
-  var drawing: Drawing?
-  var drawingImage: UIImage?
+  var drawing: UIImage?
 
   var thumbnail: Image? {
-    guard let drawingImage = self.drawingImage else {
+    guard let drawing = self.drawing else {
       return nil
     }
-    let thumbnailSize = CGSize(width: drawingImage.size.width / 6,
-                               height: drawingImage.size.height / 6)
+
+    let thumbnailSize = CGSize(width: drawing.size.width / 6, height: drawing.size.height / 6)
     let thumbnail = UIGraphicsImageRenderer(size: thumbnailSize).image { context in
-      drawingImage.draw(in: CGRect(origin: .zero,
-                                   size: thumbnailSize))
+      drawing.draw(in: CGRect(origin: .zero, size: thumbnailSize))
     }
     return Image(uiImage: thumbnail)
   }
 
+  mutating func update(drawing: UIImage) {
+    self.drawing = drawing
+  }
+
   mutating func update(shape: CellShape) {
     self.shape = shape
-  }
-
-  mutating func update(drawingImage: UIImage) {
-    self.drawingImage = drawingImage
-  }
-
-  mutating func update(drawing: Drawing) {
-    self.drawing = drawing
   }
 }
 
@@ -81,27 +74,9 @@ class CellStore: ObservableObject {
   @Published var selectedCell: Cell?
 
   @Published var cells: [Cell] = [
-    Cell(color: .red,
-         text: "Drawing in SwiftUI"),
-    Cell(color: .green,
-         offset: CGSize(width: 100, height: 300),
-         text: "Shapes")
+    Cell(color: .red, text: "Drawing in SwiftUI!"),
+    Cell(color: .green, offset: CGSize(width: 100, height: 300), text: "Shapes")
   ]
-
-  func update(cell: Cell, drawingImage: UIImage) {
-    let index = indexOf(cell: cell)
-    cells[index].update(drawingImage: drawingImage)
-  }
-
-  func updateDrawing(cell: Cell, paths: [DrawingPath], canvasSize: CGSize) {
-    let index = indexOf(cell: cell)
-    cells[index].update(drawing: Drawing(paths: paths, canvasSize: canvasSize))
-  }
-
-  func updateShape(cell: Cell, shape: CellShape) {
-    let index = indexOf(cell: cell)
-    cells[index].update(shape: shape)
-  }
 
   private func indexOf(cell: Cell) -> Int {
     guard let index = cells.firstIndex(where: { $0.id == cell.id })
@@ -116,14 +91,20 @@ class CellStore: ObservableObject {
   }
 
   func delete(cell: Cell?) {
-    guard let cell = cell else {
-      return
-    }
+    guard let cell = cell else { return }
     if selectedCell == cell {
       selectedCell = nil
     }
-    cells.removeAll {
-      $0.id == cell.id
-    }
+    cells.removeAll { $0.id == cell.id }
+  }
+
+  func updateShape(cell: Cell, shape: CellShape) {
+    let index = indexOf(cell: cell)
+    cells[index].update(shape: shape)
+  }
+
+  func updateDrawing(cell: Cell, drawing: UIImage) {
+    let index = indexOf(cell: cell)
+    cells[index].update(drawing: drawing)
   }
 }

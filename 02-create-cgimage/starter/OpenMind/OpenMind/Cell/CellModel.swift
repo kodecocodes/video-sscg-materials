@@ -1,6 +1,5 @@
-//
-/// Copyright (c) 2019 Razeware LLC
-///
+/// Copyright (c) 2022 Razeware LLC
+/// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -19,6 +18,10 @@
 /// merger, publication, distribution, sublicensing, creation of derivative works,
 /// or sale is expressly withheld.
 ///
+/// This project and source code may use libraries or frameworks that are
+/// released under various Open-Source licenses. Use of those libraries and
+/// frameworks are governed by their own individual licenses.
+///
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 /// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,32 +30,31 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-import Foundation
-import SwiftUI
 import Combine
+import SwiftUI
 
 let minCellSize = CGSize(width: 200, height: 100)
 
 struct Drawing: Equatable {
   var paths: [DrawingPath] = []
-  var canvasSize = CGSize.zero
+  var size = CGSize.zero
 }
 
 struct Cell: Identifiable, Equatable {
   var id = UUID()
-  var color = ColorPicker.Color.allCases.randomElement()!.color
+  var color = Color("Violet")
   var size = minCellSize
   var offset = CGSize.zero
   var shape = CellShape.allCases.randomElement()!
   var text = "New Idea!"
   var drawing: Drawing?
 
-  mutating func update(shape: CellShape) {
-    self.shape = shape
-  }
-
   mutating func update(drawing: Drawing) {
     self.drawing = drawing
+  }
+
+  mutating func update(shape: CellShape) {
+    self.shape = shape
   }
 }
 
@@ -60,22 +62,9 @@ class CellStore: ObservableObject {
   @Published var selectedCell: Cell?
 
   @Published var cells: [Cell] = [
-    Cell(color: .red,
-         text: "Drawing in SwiftUI"),
-    Cell(color: .green,
-         offset: CGSize(width: 100, height: 300),
-         text: "Shapes")
+    Cell(color: .red, text: "Drawing in SwiftUI!"),
+    Cell(color: .green, offset: CGSize(width: 100, height: 300), text: "Shapes")
   ]
-
-  func updateDrawing(cell: Cell, paths: [DrawingPath], canvasSize: CGSize) {
-    let index = indexOf(cell: cell)
-    cells[index].update(drawing: Drawing(paths: paths, canvasSize: canvasSize))
-  }
-
-  func updateShape(cell: Cell, shape: CellShape) {
-    let index = indexOf(cell: cell)
-    cells[index].update(shape: shape)
-  }
 
   private func indexOf(cell: Cell) -> Int {
     guard let index = cells.firstIndex(where: { $0.id == cell.id })
@@ -90,14 +79,20 @@ class CellStore: ObservableObject {
   }
 
   func delete(cell: Cell?) {
-    guard let cell = cell else {
-      return
-    }
+    guard let cell = cell else { return }
     if selectedCell == cell {
       selectedCell = nil
     }
-    cells.removeAll {
-      $0.id == cell.id
-    }
+    cells.removeAll { $0.id == cell.id }
+  }
+
+  func updateShape(cell: Cell, shape: CellShape) {
+    let index = indexOf(cell: cell)
+    cells[index].update(shape: shape)
+  }
+
+  func updateDrawing(cell: Cell, drawing: Drawing) {
+    let index = indexOf(cell: cell)
+    cells[index].update(drawing: drawing)
   }
 }
